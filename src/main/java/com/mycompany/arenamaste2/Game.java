@@ -1,6 +1,8 @@
 package com.mycompany.arenamaste2;
 
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,10 +51,23 @@ public class Game implements Navigable{
 
     @Override
     public List<Navigable> getChildren() {
-        ServiceContainer services = ArenaMaste2.getServices();
-        return services.getDatabaseService().getTournamentsDb().stream()
-                .filter(t -> t.getGame().equals(this))
-                .collect(Collectors.toList());
+        if (this.services == null) return new ArrayList<>();
+
+        List<Navigable> children = new ArrayList<>();
+
+        // 1. Agregar Torneos de este juego
+        children.addAll(services.getDatabaseService().getTournamentsDb().stream()
+                .filter(t -> t.getGame().getTitle().equalsIgnoreCase(this.title))
+                .collect(Collectors.toList()));
+
+        // 2. Agregar Jugadores que juegan este juego
+        children.addAll(services.getDatabaseService().getUsersDB().values().stream()
+                .filter(u -> u instanceof Player)
+                .map(u -> (Player) u)
+                .filter(p -> p.getGame() != null && p.getGame().getTitle().equalsIgnoreCase(this.title))
+                .collect(Collectors.toList()));
+
+        return children;
     }
 
     public ServiceContainer getServices() {

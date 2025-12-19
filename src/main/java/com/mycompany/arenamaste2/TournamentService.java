@@ -101,7 +101,7 @@ public class TournamentService {
 
     public void createTeam(Player captain){
         System.out.println("Crear team");
-        if(captain.getTeam().equals("sinTeam")){
+        if(!captain.getTeam().equals("sinTeam")){
             System.out.println("ya tienes equipo ");
             return;
         }
