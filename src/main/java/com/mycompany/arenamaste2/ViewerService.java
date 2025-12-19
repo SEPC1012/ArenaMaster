@@ -1,8 +1,10 @@
 package com.mycompany.arenamaste2;
 
+import javax.management.relation.Role;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Map;
 
 public class ViewerService {
 
@@ -74,7 +76,7 @@ public class ViewerService {
         sc.nextLine();
 
         if (select > 0 && select <= resultados.size()) {
-            navegarElemento(resultados.get(select - 1), sc);
+            navigateElements(resultados.get(select - 1), sc);
         }
     }
 
@@ -141,9 +143,46 @@ public class ViewerService {
         }
     }
 
-    private void navegarElemento(Navigable obj, Scanner sc) {
+    private void navigateElements(Navigable obj, Scanner sc) {
         showDetails(obj);
         List<Navigable> children = obj.getChildren();
         if (!children.isEmpty()) navigateList(children, sc);
+    }
+    public void showGames() {
+        System.out.println("\n--- Catálogo de Juegos ---");
+        if(services.getDatabaseService().getGameDB().isEmpty()) System.out.println("No hay juegos.");
+        else services.getDatabaseService().getGameDB().forEach(j -> System.out.println("- " + j));
+    }
+    public void showPlayers() {
+        System.out.println("\n--- Jugadores Registrados ---");
+
+        Map<?, User> userMap = services.getDatabaseService().getUsersDB();
+        List<User> allUsers = new ArrayList<>(userMap.values());
+
+        if (allUsers.isEmpty()) {
+            System.out.println("La base de datos está vacía.");
+            return;
+        }
+
+        boolean hayJugadores = false;
+
+        for (User u : allUsers) {
+            if (u.getRol() == UserRole.PLAYER) {
+                System.out.println("ID: " + u.getID() + " | Nombre: " + u.getName());
+                hayJugadores = true;
+            }
+        }
+
+        if (!hayJugadores) {
+            System.out.println("No hay jugadores registrados (solo hay admins).");
+        }
+    }
+    public void showTeams() {
+        System.out.println("\n--- Equipos Registrados ---");
+        // Itera tu lista de equipos
+        System.out.println("Listado de equipos...");
+    }
+    public void showTournaments(){
+        System.out.println(" IN development");
     }
 }

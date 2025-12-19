@@ -4,20 +4,19 @@ package com.mycompany.arenamaste2;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class Game implements Navigable{
     private String title;
     private String gender;
     private String information;
+    private List<Tournament> tournaments = new ArrayList<>();
 
-    private ServiceContainer services;
-
-    public Game(String title, String gender, String information,ServiceContainer services) {
+    public Game(String title, String gender, String information) {
         this.title = title;
         this.gender = gender;
         this.information = information;
-        this.services = services;
     }
 
     public String getTitle() {
@@ -51,30 +50,9 @@ public class Game implements Navigable{
 
     @Override
     public List<Navigable> getChildren() {
-        if (this.services == null) return new ArrayList<>();
-
-        List<Navigable> children = new ArrayList<>();
-
-        // 1. Agregar Torneos de este juego
-        children.addAll(services.getDatabaseService().getTournamentsDb().stream()
-                .filter(t -> t.getGame().getTitle().equalsIgnoreCase(this.title))
-                .collect(Collectors.toList()));
-
-        // 2. Agregar Jugadores que juegan este juego
-        children.addAll(services.getDatabaseService().getUsersDB().values().stream()
-                .filter(u -> u instanceof Player)
-                .map(u -> (Player) u)
-                .filter(p -> p.getGame() != null && p.getGame().getTitle().equalsIgnoreCase(this.title))
-                .collect(Collectors.toList()));
-
-        return children;
+        return new ArrayList<>(tournaments);
     }
 
-    public ServiceContainer getServices() {
-        return services;
-    }
 
-    public void setServices(ServiceContainer services) {
-        this.services = services;
-    }
+
 }

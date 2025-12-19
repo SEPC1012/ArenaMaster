@@ -1,9 +1,6 @@
 package com.mycompany.arenamaste2;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class TournamentService {
 
@@ -27,14 +24,13 @@ public class TournamentService {
             return;
         }
 
-        // Mostrar torneos abiertos
         System.out.println("Torneos disponibles:");
         List<Tournament> openTournaments = new ArrayList<>();
         for (int i = 0; i < tts.size(); i++) {
             Tournament tt = tts.get(i);
             if (tt.isClosed()) {
                 System.out.println((i + 1) + ". " + tt.getName() + " (CERRADO)");
-                continue; // salta torneos cerrados
+                continue;
             }
             openTournaments.add(tt);
             System.out.println((openTournaments.size()) + ". " + tt.getName() +
@@ -48,7 +44,6 @@ public class TournamentService {
             return;
         }
 
-        // Selección de torneo
         Scanner sc = new Scanner(System.in);
         System.out.print("Seleccione torneo: ");
         int op = sc.nextInt();
@@ -61,9 +56,7 @@ public class TournamentService {
 
         Tournament tt = openTournaments.get(op - 1);
 
-        // Validar tipo de torneo
         if (tt.getAllowedParticipantType() == ParticipantType.TEAM) {
-            // Solo capitan puede inscribir su equipo
             Team team = services.getDatabaseService().getTeamsDB().stream()
                     .filter(tm -> tm.getCaptain() == player)
                     .findFirst()
@@ -82,7 +75,7 @@ public class TournamentService {
             tt.getParticipants().add(team);
             System.out.println("Equipo " + team.getName() + " inscrito en " + tt.getName());
 
-        } else { // Torneo de jugadores
+        } else {
             if (tt.getParticipants().contains(player)) {
                 System.out.println("Ya estás inscrito en este torneo.");
                 return;
@@ -92,7 +85,6 @@ public class TournamentService {
             System.out.println("Jugador " + player.getNickName() + " inscrito en " + tt.getName());
         }
 
-        // Simular automáticamente si el torneo se llena
         if (tt.isFull()) {
             System.out.println("Torneo lleno. Se simulará automáticamente.");
             simulateTournament(tt);
@@ -158,6 +150,39 @@ public class TournamentService {
         System.out.println("equipo creado y registrado");
 
     }
+
+    public void verifyTournament(){
+        Scanner sc = new Scanner(System.in);
+        List<Tournament> ts = services.getDatabaseService().getTournamentsDb();
+
+        if (ts.isEmpty()) {
+            System.out.println("⚠No hay torneos registrados para simular.");
+            return;
+        }
+
+        System.out.println("\n--- Seleccionar Torneo ---");
+        for (Tournament t : ts) {
+            System.out.println("ID: " + t.getID() + " | Nombre: " + t.getName() +
+                    " | Estado: " + (t.isClosed() ? "Cerrado" : "Abierto"));
+        }
+
+        System.out.print("Ingrese ID del torneo a simular: ");
+        String idBuscado = sc.nextLine(); // O sc.nextInt() si tu ID es int
+
+        Tournament tt = null;
+        for (Tournament t : ts) {
+            if (t.getID().equals(idBuscado)) {
+                tt = t;
+                break;
+            }
+        }
+
+        if (tt == null) {
+            System.out.println("Torneo no encontrado.");
+            return;
+        }
+        simulateTournament(tt);
+    }
     public void simulateTournament(Tournament tt){
         Scanner sc = new Scanner(System.in);
         if (tt.isClosed()) {
@@ -217,6 +242,71 @@ public class TournamentService {
         System.out.println("1°: " + campeon.getName());
 
         tt.setClosed(true);
+    }
+
+    public void createTournament() {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("\n--- Crear Nuevo Torneo ---");
+
+        String newID;
+        boolean idExiste;
+
+        do {
+            newID = UUID.randomUUID().toString().substring(0, 8);
+            idExiste = false;
+
+            for (Tournament t : services.getDatabaseService().getTournamentsDb()) {
+                if (t.getID().equals(newID)) {
+                    idExiste = true;
+                    break;
+                }
+            }
+        } while (idExiste);
+
+        System.out.println("ID Generado: " + newID);
+
+        System.out.print("Nombre del torneo: ");
+        String name = sc.nextLine();
+
+        List<Game> gamesList = services.getDatabaseService().getGameDB();
+
+        if (gamesList.isEmpty()) {
+            System.out.println("Error: No hay juegos registrados. Crea un juego primero (Opción 4).");
+            return;
+        }
+
+        System.out.println("Seleccione el Juego para el torneo:");
+        for (int i = 0; i < gamesList.size(); i++) {
+            System.out.println((i + 1) + ". " + gamesList.get(i).getName());
+        }
+
+        System.out.print("Opción: ");
+        int gameIndex = sc.nextInt() - 1;
+        sc.nextLine();
+
+        if (gameIndex < 0 || gameIndex >= gamesList.size()) {
+            System.out.println(" Opción de juego inválida.");
+            return;
+        }
+        Game selectedGame = gamesList.get(gameIndex);
+
+        System.out.println("Tipo de participación:");
+        System.out.println("1. Individual (Player)");
+        System.out.println("2. Equipo (Team)");
+        System.out.print("Opción: ");
+        int typeOp = sc.nextInt();
+
+        ParticipantType type = (typeOp == 2) ? ParticipantType.TEAM : ParticipantType.PLAYER;
+
+        System.out.print("Cantidad máxima de participantes: ");
+        int maxParticipants = sc.nextInt();
+        sc.nextLine();
+
+        Tournament newTournament = new Tournament(newID, name, selectedGame, type, false, maxParticipants);
+
+        services.getDatabaseService().getTournamentsDb().add(newTournament);
+
+        System.out.println("Torneo '" + name + "' (ID: " + newID + ") creado exitosamente.");
     }
 
 }

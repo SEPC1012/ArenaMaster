@@ -112,4 +112,14 @@ public class AuthService {
         currentUser=null;
 
     }
+    public void banearJugador() {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("\n--- Banear Jugador ---");
+
+        System.out.print("Ingrese ID o Email del jugador: ");
+        String entrada = sc.nextLine();
+
+        System.out.println("Buscando usuario '" + entrada + "' para banear...");
+        // user.setBanned(true);
+    }
 }

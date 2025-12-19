@@ -53,4 +53,5 @@ public abstract class User {
     public UserRole getRol() {
         return rol;
     }
+
 }

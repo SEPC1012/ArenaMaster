@@ -10,6 +10,8 @@ public class Match implements Navigable{
     private Participant p2;
     private Score score;
 
+    private boolean played = false;
+
     private Map<Participant, Boolean> results = new HashMap<>();
 
     public Match(Participant p1, Participant p2) {
@@ -31,6 +33,8 @@ public class Match implements Navigable{
         p1.addMatch(this);
         p2.addMatch(this);
 
+        this.played = true;
+
         return ganador;
     }
     public Boolean getResult(Participant p) {
@@ -39,12 +43,15 @@ public class Match implements Navigable{
 
     @Override
     public String toString() {
-        String detallePartida = p1.getName() + " vs " + p2.getName()
-                              + " → Ganador: " + score.getGanador().getName()
-                              + " (" + score.getPuntosP1() + " - " + score.getPuntosP2() + ")";
+        if (!played || score.getGanador() == null) {
+            return p1.getName() + " vs " + p2.getName() + " [Pendiente]";
+        }
 
-        return detallePartida;
+        return p1.getName() + " vs " + p2.getName()
+                + " → Ganador: " + score.getGanador().getName()
+                + " (" + score.getPuntosP1() + " - " + score.getPuntosP2() + ")";
     }
+
     @Override
     public String getName() {
         return p1.getName() + " vs " + p2.getName();

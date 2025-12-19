@@ -84,8 +84,6 @@ public class Team implements Participant,Navigable {
     }
 
 
-
-
     public boolean addPlayer(Player p) {
         if (players.contains(p)) {
             System.out.println("El jugador ya está en el equipo.");

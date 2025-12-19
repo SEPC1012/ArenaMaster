@@ -37,45 +37,49 @@ public class Admin extends User {
 
                 case 1 -> {
                     System.out.println("\n--- Crear Torneo ---");
-
+                    services.getTournamentService().createTournament();
                 }
 
                 case 2 -> {
                     System.out.println("\n--- Torneos ---");
-
+                    services.getViewerService().showTournaments();
                 }
 
                 case 3 -> {
-
-
+                    services.getTournamentService().verifyTournament();
 
                     System.out.println("In development");
 
                 }
 
                 case 4 -> {
+                    services.getDatabaseService().addGame();
                     System.out.println("In development");
 
                 }
 
                 case 5 -> {
+                    services.getViewerService().showTeams();
                     System.out.println("\n--- Equipos ---");
 
 
                 }
 
                 case 6 -> {
+                    services.getViewerService().showGames();
                     System.out.println("\n--- Juegos ---");
 
 
                 }
 
                 case 7 -> {
+                    services.getViewerService().showPlayers();
                     System.out.println("In development");
 
                 }
 
                 case 8 -> {
+                    services.getAuthService().banearJugador();
                     System.out.println("In development");
                 }
                 case 9->{

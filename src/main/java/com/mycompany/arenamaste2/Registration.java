@@ -1,5 +1,6 @@
-// no hace nd lo sustituye el particpant
-// crear equipo
-// llamar a viewer
-//todo menu de admin
-
+// ver tornos
+// simular (verificacion de torneos con participant)
+// ver equipos
+// ver juegos
+// banear
+// navegar

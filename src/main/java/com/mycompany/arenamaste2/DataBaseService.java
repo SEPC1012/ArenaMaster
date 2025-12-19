@@ -1,8 +1,5 @@
 package com.mycompany.arenamaste2;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DataBaseService {
     private Map<String, User> usersDB;
@@ -27,11 +24,11 @@ public class DataBaseService {
         this.gameDB = new ArrayList<>();
         this.bannedDB = new ArrayList<>();
 
-        Game dota2 = new Game("DOTA2", "MOBA", "Juego 5 vs 5",services);
-        Game lol = new Game("League of Legends", "MOBA", "Juego 5 vs 5",services);
-        Game clashRoyale = new Game("Clash Royale", "Estrategia", "Juego individual 1 vs 1",services);
-        Game valorant = new Game("Valorant", "Shooter", "Juego 5 vs 5",services);
-        Game csgo = new Game("CS:GO", "Shooter", "Juego 5 vs 5",services);
+        Game dota2 = new Game("DOTA2", "MOBA", "Juego 5 vs 5");
+        Game lol = new Game("League of Legends", "MOBA", "Juego 5 vs 5");
+        Game clashRoyale = new Game("Clash Royale", "Estrategia", "Juego individual 1 vs 1");
+        Game valorant = new Game("Valorant", "Shooter", "Juego 5 vs 5");
+        Game csgo = new Game("CS:GO", "Shooter", "Juego 5 vs 5");
 
         this.gameDB.add(dota2);
         this.gameDB.add(lol);
@@ -100,4 +97,19 @@ public class DataBaseService {
     public void setBannedDB(List<String> bannedDB) {
         this.bannedDB = bannedDB;
     }
+    public void addGame() {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("\n--- Agregar Juego ---");
+
+        System.out.print("Nombre del juego: ");
+        String name = sc.nextLine();
+        System.out.println("defiinir generp");
+        String gender = sc.nextLine();
+        System.out.println(" meter info");
+        String info= sc.nextLine();
+        Game game = new Game(name,gender,info);
+        gameDB.add(game);
+        System.out.println("Juego guardado.");
+    }
+
 }
