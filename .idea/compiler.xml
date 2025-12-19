@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="ArenaMaste2" />
+        <module name="ArenaMaster" />
       </profile>
     </annotationProcessing>
   </component>

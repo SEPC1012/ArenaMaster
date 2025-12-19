@@ -1,5 +1,7 @@
 package com.mycompany.arenamaste2;
 
+import java.util.List;
+
 public interface Participant {
 
     String getId();
@@ -7,11 +9,17 @@ public interface Participant {
 
     ParticipantType getType();
 
-    Statistics getStatistics();
+    //Statistics getStatistics();
 
-    String getInfo();
+    String showInfo();
+    void requestEnrollment(ServiceContainer services);
 
-    boolean canJoinTournament(Tournament tournament);
+    List<Match> getLastMatches();
+    void addMatch(Match match);
+
+    List<Tournament> getLastTournaments();
+    void addTournament(Tournament tournament);
+
 }
 
 

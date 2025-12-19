@@ -13,9 +13,9 @@ public abstract class User {
     protected String email;
     protected String ID;
     protected String password;
-    protected String rol;
+    protected UserRole rol;
 
-    public User(String name, String surname, String email, String ID, String password, String rol) {
+    public User(String name, String surname, String email, String ID, String password, UserRole rol) {
         this.name = name;
         this.surname = surname;
         this.email = email;
@@ -26,4 +26,31 @@ public abstract class User {
 
     public abstract void showMenu(ServiceContainer services);
 
+    public ServiceContainer getServices() {
+        return services;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getID() {
+        return ID;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public UserRole getRol() {
+        return rol;
+    }
 }

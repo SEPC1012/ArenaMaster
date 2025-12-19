@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class Admin extends User {
 
-    public Admin(String name, String surname, String email, String ID, String password, String rol) {
+    public Admin(String name, String surname, String email, String ID, String password, UserRole rol) {
         super(name, surname, email, ID, password, rol);
     }
 
@@ -46,6 +46,9 @@ public class Admin extends User {
                 }
 
                 case 3 -> {
+
+
+
                     System.out.println("In development");
 
                 }
@@ -77,6 +80,7 @@ public class Admin extends User {
                 }
                 case 9->{
                     System.out.println("Cerrando sesión...");
+                    services.getAuthService().logout();
 
 
                 }

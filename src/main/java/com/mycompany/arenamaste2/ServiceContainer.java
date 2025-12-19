@@ -11,13 +11,13 @@ public class ServiceContainer {
         this.databaseService = new DataBaseService();
         System.out.println(" DatabaseService - Datos cargados");
 
-        this.viewerService = new ViewerService(databaseService);
+        this.viewerService = new ViewerService(this);
         System.out.println(" ViewerService inicializado");
 
-        this.authService = new AuthService(databaseService);
+        this.authService = new AuthService(this);
         System.out.println(" AuthService inicializado");
 
-        this.tournamentService = new TournamentService(databaseService);
+        this.tournamentService = new TournamentService(this);
         System.out.println(" TournamentService inicializado");
 
         System.out.println("\nSistema listo!\n");

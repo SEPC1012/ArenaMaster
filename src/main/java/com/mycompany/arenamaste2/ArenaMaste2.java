@@ -3,7 +3,7 @@ package com.mycompany.arenamaste2;
 import java.util.Scanner;
 
 public class ArenaMaste2 {
-
+    private static ServiceContainer services;
     public static void main(String[] args) {
 
         ServiceContainer services = new ServiceContainer();
@@ -37,7 +37,7 @@ public class ArenaMaste2 {
                     services.getAuthService().registerUser();
                 }
                 case 3 -> {
-                    System.out.println("In development");
+                    services.getViewerService().showMenu();
 
                 }
                 case 4 -> {
@@ -52,6 +52,8 @@ public class ArenaMaste2 {
 
         sc.close();
     }
-
+    public static ServiceContainer getServices() {
+        return services;
+    }
 
 }

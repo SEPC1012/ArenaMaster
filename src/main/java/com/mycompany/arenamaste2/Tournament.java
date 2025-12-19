@@ -1,37 +1,58 @@
 package com.mycompany.arenamaste2;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.stream.Collectors;
 
-public class Tournament {
-
+public class Tournament implements Navigable {
+    private String ID;
     private String name;
     private Game game;
-    private boolean allowsTeams;
+    private ParticipantType allowedParticipantType;
     private boolean closed;
+    private int maxParticipant;
     private List<Participant> participants;
+    private List<Round> rounds;
+    private List<Match> matches;
 
-    public Tournament(String name, Game game, boolean allowsTeams) {
+    private Map<Participant, Integer> standings = new HashMap<>();
+
+    public Tournament(String ID, String name, Game game, ParticipantType allowedParticipantType, boolean closed, int maxParticipant) {
+        this.ID = ID;
         this.name = name;
         this.game = game;
-        this.allowsTeams = allowsTeams;
+        this.allowedParticipantType = allowedParticipantType;
         this.closed = false;
+        this.maxParticipant = maxParticipant;
+
         this.participants = new ArrayList<>();
+        this.rounds = new ArrayList<>();
+        this.matches = new ArrayList<>();
     }
 
-
-
-    public boolean isClosed() {
-        return closed;
+    public void setPosition(Participant p, int position) {
+        standings.put(p, position);
+        p.addTournament(this); // Actualiza historial de los últimos 5 torneos
     }
 
-    public void setClosed(boolean closed) {
-        this.closed = closed;
+    public Integer getPosition(Participant p) {
+        return standings.get(p);
     }
 
+    public void addParticipant(Participant p) {
+        if (!participants.contains(p) && !isFull()) {
+            participants.add(p);
+        }
+    }
     public String getName() {
         return name;
+    }
+
+    @Override
+    public List<Navigable> getChildren() {
+        return participants.stream()
+                .filter(p -> p instanceof Navigable)
+                .map(p -> (Navigable) p)
+                .collect(Collectors.toList());
     }
 
     public void setName(String name) {
@@ -46,12 +67,20 @@ public class Tournament {
         this.game = game;
     }
 
-    public boolean isAllowsTeams() {
-        return allowsTeams;
+    public ParticipantType getAllowedParticipantType() {
+        return allowedParticipantType;
     }
 
-    public void setAllowsTeams(boolean allowsTeams) {
-        this.allowsTeams = allowsTeams;
+    public int getMaxParticipant() {
+        return maxParticipant;
+    }
+
+    public void setMaxParticipant(int maxParticipant) {
+        this.maxParticipant = maxParticipant;
+    }
+
+    public void setAllowedParticipantType(ParticipantType allowedParticipantType) {
+        this.allowedParticipantType = allowedParticipantType;
     }
 
     public List<Participant> getParticipants() {
@@ -62,8 +91,29 @@ public class Tournament {
         this.participants = participants;
     }
 
-    public void addParticipants(Participant p){
-        System.out.println("In development");
+    public String getID() {
+        return ID;
     }
 
+    public List<Round> getRounds() {
+        return rounds;
+    }
+
+    public List<Match> getMatches() {
+        return matches;
+    }
+    public boolean isFull(){
+        return participants.size() >= maxParticipant;
+    }
+
+
+    public boolean isClosed() {
+        return closed;
+    }
+
+    public void setClosed(boolean closed) {
+        this.closed = closed;
+    }
 }
+
+
