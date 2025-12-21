@@ -1,10 +1,9 @@
 package com.mycompany.arenamaste2;
 
-import javax.management.relation.Role;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Map;
+import java.util.Scanner;
 
 public class ViewerService {
 
@@ -16,143 +15,204 @@ public class ViewerService {
 
     public void showMenu() {
         Scanner sc = new Scanner(System.in);
-        int opcion;
-
+        int op;
         do {
-            System.out.println("\n=== MODO ESPECTADOR ===");
-            System.out.println("1. Buscar");
-            System.out.println("2. Navegar por jerarquías");
-            System.out.println("0. Salir");
-            System.out.print("Elige una opción: ");
-            opcion = sc.nextInt();
-            sc.nextLine();
+            System.out.println("\n1. Ver torneos");
+            System.out.println("2. Ver ranking de jugadores");
+            System.out.println("3. Ver historial de jugador");
+            System.out.println("4. Navegar Sistema de Torneos");
+            System.out.println("5. Salir");
+            try {
+                op = Integer.parseInt(sc.nextLine());
+            } catch (NumberFormatException e) {
+                op = -1;
+            }
 
-            switch (opcion) {
-                case 1 -> searchForInfo(sc);
-                case 2 -> navigate(sc);
-                case 0 -> System.out.println("Saliendo...");
+            switch (op) {
+                case 1 -> showTournaments();
+                case 2 -> showRanking(sc);
+                case 3 -> showPlayerHistory(sc);
+                case 4 -> navigateTournaments(sc);
+                case 5 -> System.out.println("Saliendo de vista espectador...");
                 default -> System.out.println("Opción inválida.");
             }
-
-        } while (opcion != 0);
+        } while (op != 5);
     }
 
-    private void searchForInfo(Scanner sc) {
-        System.out.print("buscar: ");
-        String texto = sc.nextLine().toLowerCase();
+    private void showRanking(Scanner sc) {
+        System.out.println("\n=== SELECCIONE EL JUEGO PARA EL RANKING ===");
+        List<Game> games = services.getDatabaseService().getGameDB();
 
-        List<Navigable> resultados = new ArrayList<>();
+        for (int i = 0; i < games.size(); i++) {
+            System.out.println((i + 1) + ". " + games.get(i).getTitle());
+        }
+        System.out.println("0. Cancelar");
+        System.out.print("Seleccione un juego: ");
 
-        for (Game g : services.getDatabaseService().getGameDB()) {
-            if (g.getTitle().toLowerCase().contains(texto)) resultados.add(g);
+        int op = -1;
+        try {
+            op = Integer.parseInt(sc.nextLine());
+        } catch (NumberFormatException e) {
+            // Ignore
         }
 
-        for (Tournament t : services.getDatabaseService().getTournamentsDb()) {
-            if (t.getName().toLowerCase().contains(texto)) resultados.add(t);
-        }
+        if (op < 1 || op > games.size())
+            return;
 
-        for (Team team : services.getDatabaseService().getTeamsDB()) {
-            if (team.getName().toLowerCase().contains(texto)) resultados.add(team);
-        }
+        Game selectedGame = games.get(op - 1);
 
+        System.out.println("\n=== RANKING DE JUGADORES - " + selectedGame.getTitle() + " ===");
+        List<Player> players = new ArrayList<>();
         for (User u : services.getDatabaseService().getUsersDB().values()) {
-            if (u instanceof Player p) {
-                if (p.getNickName().toLowerCase().contains(texto)) resultados.add(p);
+            if (u instanceof Player p && p.getGame().equals(selectedGame)) {
+                players.add(p);
             }
         }
 
-        if (resultados.isEmpty()) {
-            System.out.println("No se encontró nada.");
-            return;
+        players.sort((p1, p2) -> Integer.compare(p2.getLastTournaments().size(), p1.getLastTournaments().size()));
+
+        if (players.isEmpty())
+            System.out.println("No hay jugadores registrados para este juego.");
+        else {
+            for (int i = 0; i < players.size(); i++) {
+                Player p = players.get(i);
+                System.out.println(
+                        (i + 1) + ". " + p.getNickName() + " (Torneos: " + p.getLastTournaments().size() + ")");
+            }
         }
 
-        System.out.println("\nResultados:");
-        for (int i = 0; i < resultados.size(); i++) {
-            System.out.println((i + 1) + ". " + resultados.get(i).getName());
+        System.out.println("\n=== LISTADO DE EQUIPOS DE " + selectedGame.getTitle().toUpperCase() + " ===");
+        List<Team> teams = services.getDatabaseService().getTeamsDB();
+        boolean foundTeam = false;
+
+        for (Team t : teams) {
+            if (t.getCaptain().getGame().equals(selectedGame)) {
+                System.out.println("- " + t.getName() + " (Capitán: " + t.getCaptain().getNickName() + ")");
+                foundTeam = true;
+            }
         }
 
-        System.out.print("Selecciona un número o 0 para salir: ");
-        int select = sc.nextInt();
+        if (!foundTeam)
+            System.out.println("No hay equipos registrados para este juego.");
+
+        System.out.println("\nPresione Enter para continuar...");
         sc.nextLine();
+    }
 
-        if (select > 0 && select <= resultados.size()) {
-            navigateElements(resultados.get(select - 1), sc);
+    private void showPlayerHistory(Scanner sc) {
+        System.out.println("\n=== HISTORIAL DE JUGADOR ===");
+        System.out.print("Ingrese nickname del jugador a buscar: ");
+        String busqueda = sc.nextLine();
+
+        Player found = null;
+        for (User u : services.getDatabaseService().getUsersDB().values()) {
+            if (u instanceof Player p && p.getNickName().equalsIgnoreCase(busqueda)) {
+                found = p;
+                break;
+            }
         }
-    }
 
-    private void navigate(Scanner sc) {
-        List<Game> juegos = services.getDatabaseService().getGameDB();
-        List<Navigable> listaJuegos = new ArrayList<>(juegos);
-
-        navigateList(listaJuegos, sc);
-    }
-
-    private void navigateList(List<Navigable> lista, Scanner sc) {
-        if (lista.isEmpty()) {
-            System.out.println("No hay elementos para mostrar.");
+        if (found == null) {
+            System.out.println("Jugador no encontrado.");
             return;
         }
 
+        System.out.println("\n--- Historial de " + found.getNickName() + " ---");
+        System.out.println("Últimos Partidos:");
+        List<Match> matches = found.getLastMatches();
+        if (matches.isEmpty())
+            System.out.println(" - Sin partidos registrados.");
+        else {
+            for (Match m : matches) {
+                System.out.println(" - " + m.toString());
+            }
+        }
+
+        System.out.println("\nÚltimos Torneos:");
+        List<Tournament> tournaments = found.getLastTournaments();
+        if (tournaments.isEmpty())
+            System.out.println(" - Sin torneos registrados.");
+        else {
+            for (Tournament t : tournaments) {
+                System.out.println(" - " + t.getName());
+            }
+        }
+
+        System.out.println("\nPresione Enter para continuar...");
+        sc.nextLine();
+    }
+
+    public void navigateTournaments(Scanner sc) {
+        System.out.println("\n=== NAVEGADOR DE TORNEOS ===");
+        List<Tournament> tournaments = services.getDatabaseService().getTournamentsDb();
+
+        if (tournaments.isEmpty()) {
+            System.out.println("No hay torneos registrados.");
+            return;
+        }
+
+        Navigable root = new Navigable() {
+            @Override
+            public String getName() {
+                return "Lista de Torneos";
+            }
+
+            @Override
+            public List<Navigable> getChildren() {
+                return new ArrayList<>(tournaments);
+            }
+        };
+
+        navigate(root, sc);
+    }
+
+    private void navigate(Navigable node, Scanner sc) {
         while (true) {
-            System.out.println("\n=== SELECCIONA UNA OPCIÓN ===");
-            int limit = Math.min(10, lista.size());
-            for (int i = 0; i < limit; i++) {
-                System.out.println((i + 1) + ". " + lista.get(i).getName());
-            }
-            System.out.println("0. Salir");
+            System.out.println("\n--- " + node.getName() + " ---");
+            List<Navigable> children = node.getChildren();
 
-            System.out.print("escoge un numero: ");
-            int option = sc.nextInt();
-            sc.nextLine();
+            if (children.isEmpty()) {
+                System.out.println("[Este elemento no tiene sub-elementos (Detalle Final)]");
+                System.out.println("0. Regresar");
 
-            if (option == 0) break;
-            if (option < 1 || option > limit) {
-                System.out.println("esocge bien.");
-                continue;
-            }
-
-            Navigable selected = lista.get(option - 1);
-            showDetails(selected);
-
-            List<Navigable> children;
-            children = selected.getChildren();
-            if (!children.isEmpty()) {
-                navigateList(children, sc);
-            } else {
-                System.out.println("No hay más elementos ");
+                System.out.print("Presione Enter para regresar...");
                 sc.nextLine();
+                return;
+            }
+
+            for (int i = 0; i < children.size(); i++) {
+                System.out.println((i + 1) + ". " + children.get(i).getName());
+            }
+            System.out.println("0. Regresar");
+            System.out.print("Seleccione una opción: ");
+
+            int op = -1;
+            try {
+                op = Integer.parseInt(sc.nextLine());
+            } catch (NumberFormatException e) {
+                // Ignore
+            }
+
+            if (op == 0) {
+                return;
+            }
+
+            if (op > 0 && op <= children.size()) {
+                navigate(children.get(op - 1), sc);
+            } else {
+                System.out.println("Opción inválida.");
             }
         }
     }
 
-    private void showDetails(Navigable obj) {
-        System.out.println("detalles");
-
-        if (obj instanceof Game g) {
-            System.out.println("juego: " + g.getTitle());
-        } else if (obj instanceof Tournament t) {
-            System.out.println("torneo: " + t.getName());
-            System.out.println("participantes: " + t.getParticipants().size());
-        } else if (obj instanceof Team team) {
-            System.out.println("equipo: " + team.getName());
-            System.out.println("jugadores: " + team.getPlayers().size());
-        } else if (obj instanceof Player p) {
-            System.out.println("jugador: " + p.getNickName());
-            System.out.println("nombre real: " + p.getName());
-            System.out.println("email: " + p.getEmail());
-        }
-    }
-
-    private void navigateElements(Navigable obj, Scanner sc) {
-        showDetails(obj);
-        List<Navigable> children = obj.getChildren();
-        if (!children.isEmpty()) navigateList(children, sc);
-    }
     public void showGames() {
         System.out.println("\n--- Catálogo de Juegos ---");
-        if(services.getDatabaseService().getGameDB().isEmpty()) System.out.println("No hay juegos.");
-        else services.getDatabaseService().getGameDB().forEach(j -> System.out.println("- " + j));
+        if (services.getDatabaseService().getGameDB().isEmpty())
+            System.out.println("No hay juegos.");
+        else
+            services.getDatabaseService().getGameDB().forEach(j -> System.out.println("- " + j));
     }
+
     public void showPlayers() {
         System.out.println("\n--- Jugadores Registrados ---");
 
@@ -177,12 +237,13 @@ public class ViewerService {
             System.out.println("No hay jugadores registrados (solo hay admins).");
         }
     }
+
     public void showTeams() {
         System.out.println("\n--- Equipos Registrados ---");
-        // Itera tu lista de equipos
         System.out.println("Listado de equipos...");
     }
-    public void showTournaments(){
+
+    public void showTournaments() {
         System.out.println(" IN development");
     }
 }

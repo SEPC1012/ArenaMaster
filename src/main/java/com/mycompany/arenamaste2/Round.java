@@ -3,10 +3,12 @@ package com.mycompany.arenamaste2;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Round {
+public class Round implements Navigable {
+    private String name;
     private List<Match> matches;
 
-    public Round(List<Match> matches) {
+    public Round(String name, List<Match> matches) {
+        this.name = name;
         this.matches = matches;
     }
 
@@ -18,5 +20,14 @@ public class Round {
         }
         return ganadores;
     }
-}
 
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public List<Navigable> getChildren() {
+        return new ArrayList<>(matches);
+    }
+}

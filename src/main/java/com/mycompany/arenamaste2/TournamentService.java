@@ -1,6 +1,10 @@
 package com.mycompany.arenamaste2;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Scanner;
+import java.util.UUID;
 
 public class TournamentService {
 
@@ -14,8 +18,7 @@ public class TournamentService {
         return services;
     }
 
-
-    public void enrollParticipant(Player player){
+    public void enrollParticipant(Player player) {
         System.out.println("Inscribir Participante");
 
         List<Tournament> tts = services.getDatabaseService().getTournamentsDb();
@@ -91,9 +94,9 @@ public class TournamentService {
         }
     }
 
-    public void createTeam(Player captain){
+    public void createTeam(Player captain) {
         System.out.println("Crear team");
-        if(!captain.getTeam().equals("sinTeam")){
+        if (!captain.getTeam().equals("sinTeam")) {
             System.out.println("ya tienes equipo ");
             return;
         }
@@ -110,48 +113,49 @@ public class TournamentService {
         team.addPlayer(captain);
         captain.setTeam(name);
 
-        while(team.getPlayers().size()<5){
+        while (team.getPlayers().size() < 5) {
             List<Player> dispo = new ArrayList<>();
-            for(User u:services.getDatabaseService().getUsersDB().values()){
-                if (u instanceof Player p){
-                    if (p.getTeam().equals("sinTeam")&&p != captain){
+            for (User u : services.getDatabaseService().getUsersDB().values()) {
+                if (u instanceof Player p) {
+                    if (p.getTeam().equals("sinTeam") && p != captain) {
                         dispo.add(p);
                     }
                 }
             }
-            if (dispo.isEmpty()){
-                System.out.println( "no hay jjugadores disponibles");
+            if (dispo.isEmpty()) {
+                System.out.println("no hay jjugadores disponibles");
                 break;
             }
             System.out.println("jugadores disponibles");
-            for (int i =0; i < dispo.size();i++){
-                System.out.println((i+1)+". "+ dispo.get(i).getNickName());
+            for (int i = 0; i < dispo.size(); i++) {
+                System.out.println((i + 1) + ". " + dispo.get(i).getNickName());
             }
 
             System.out.println("0. terminar");
             System.out.println("seleciones jugador: ");
-            int op= sc.nextInt();
+            int op = sc.nextInt();
             sc.nextLine();
 
-            if(op == 0) break;
+            if (op == 0)
+                break;
 
-            if (op<1 || op> dispo.size()){
+            if (op < 1 || op > dispo.size()) {
                 System.out.println(" opcion invalida");
                 continue;
             }
 
-            Player selected = dispo.get(op-1);
+            Player selected = dispo.get(op - 1);
             team.addPlayer(selected);
             selected.setTeam(name);
 
-            System.out.println(selected.getNickName()+"agregado al equuipo");
+            System.out.println(selected.getNickName() + "agregado al equuipo");
         }
         services.getDatabaseService().getTeamsDB().add(team);
         System.out.println("equipo creado y registrado");
 
     }
 
-    public void verifyTournament(){
+    public void verifyTournament() {
         Scanner sc = new Scanner(System.in);
         List<Tournament> ts = services.getDatabaseService().getTournamentsDb();
 
@@ -183,7 +187,8 @@ public class TournamentService {
         }
         simulateTournament(tt);
     }
-    public void simulateTournament(Tournament tt){
+
+    public void simulateTournament(Tournament tt) {
         Scanner sc = new Scanner(System.in);
         if (tt.isClosed()) {
             System.out.println("Torneo " + tt.getName() + " ya ha sido simulado.");
@@ -195,10 +200,10 @@ public class TournamentService {
             return;
         }
 
-        if(!tt.isFull()){
+        if (!tt.isFull()) {
             System.out.println("el torneo todavia no se llena; simular de todos modos?(1. Si; 2. No)");
             int op = sc.nextInt();
-            if (op != 1){
+            if (op != 1) {
                 return;
             }
         }
@@ -211,9 +216,12 @@ public class TournamentService {
 
         while (currentRound.size() > 1) {
             String nombreRonda;
-            if (currentRound.size() >= 8) nombreRonda = "=== CUARTOS DE FINAL ===";
-            else if (currentRound.size() >= 4) nombreRonda = "=== SEMIFINALES ===";
-            else nombreRonda = "=== FINAL ===";
+            if (currentRound.size() >= 8)
+                nombreRonda = "=== CUARTOS DE FINAL ===";
+            else if (currentRound.size() >= 4)
+                nombreRonda = "=== SEMIFINALES ===";
+            else
+                nombreRonda = "=== FINAL ===";
 
             System.out.println("\n" + nombreRonda);
 
@@ -227,7 +235,7 @@ public class TournamentService {
                 }
             }
 
-            Round ronda = new Round(matches);
+            Round ronda = new Round(nombreRonda, matches);
 
             tt.getRounds().add(ronda);
             tt.getMatches().addAll(matches);

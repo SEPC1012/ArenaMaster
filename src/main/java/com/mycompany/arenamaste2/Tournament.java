@@ -1,7 +1,9 @@
 package com.mycompany.arenamaste2;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Tournament implements Navigable {
     private String ID;
@@ -16,7 +18,8 @@ public class Tournament implements Navigable {
 
     private Map<Participant, Integer> standings = new HashMap<>();
 
-    public Tournament(String ID, String name, Game game, ParticipantType allowedParticipantType, boolean closed, int maxParticipant) {
+    public Tournament(String ID, String name, Game game, ParticipantType allowedParticipantType, boolean closed,
+            int maxParticipant) {
         this.ID = ID;
         this.name = name;
         this.game = game;
@@ -43,16 +46,14 @@ public class Tournament implements Navigable {
             participants.add(p);
         }
     }
+
     public String getName() {
         return name;
     }
 
     @Override
     public List<Navigable> getChildren() {
-        return participants.stream()
-                .filter(p -> p instanceof Navigable)
-                .map(p -> (Navigable) p)
-                .collect(Collectors.toList());
+        return new ArrayList<>(rounds);
     }
 
     public void setName(String name) {
@@ -102,10 +103,10 @@ public class Tournament implements Navigable {
     public List<Match> getMatches() {
         return matches;
     }
-    public boolean isFull(){
+
+    public boolean isFull() {
         return participants.size() >= maxParticipant;
     }
-
 
     public boolean isClosed() {
         return closed;
@@ -115,5 +116,3 @@ public class Tournament implements Navigable {
         this.closed = closed;
     }
 }
-
-

@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 public class ArenaMaste2 {
     private static ServiceContainer services;
+
     public static void main(String[] args) {
 
         ServiceContainer services = new ServiceContainer();
@@ -34,7 +35,7 @@ public class ArenaMaste2 {
                     services.getAuthService().login();
                 }
                 case 2 -> {
-                    services.getAuthService().registerUser();
+                    new Registration(services).registerUser();
                 }
                 case 3 -> {
                     services.getViewerService().showMenu();
@@ -52,6 +53,7 @@ public class ArenaMaste2 {
 
         sc.close();
     }
+
     public static ServiceContainer getServices() {
         return services;
     }
